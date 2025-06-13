@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.keshe.mapper.AuthMapper">
+    <select id="findByPhoneAndPasswordAndRole" resultType="com.example.keshe.entity.User">
+        SELECT * FROM users WHERE phone = #{phone} AND password = #{password} AND role = #{role}
+    </select>
+
+    <select id="existsByPhone" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM users WHERE phone = #{phone}
+    </select>
+
+    <insert id="insertUser" parameterType="com.example.keshe.entity.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO merchant_apply (username, password, phone, role)
+        VALUES (#{username}, #{password}, #{phone}, #{role})
+    </insert>
+</mapper>

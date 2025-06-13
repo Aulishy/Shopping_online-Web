@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.keshe.mapper.UserHomeMapper">
+    <resultMap id="productSaleResult" type="com.example.keshe.response.UserHomeResponse$HotProduct">
+        <id property="product_id" column="product_id"/>
+         <result property="shop_id" column="shop_id"/>
+         <result property="sold" column="sold"/>
+         <result property="stock" column="stock"/>
+         <result property="income" column="income"/>
+         <result property="price" column="price"/>
+         <result property="imageUrl" column="imageUrl"/>
+         <result property="product_name" column="product_name"/>
+         <result property="category" column="category"/>
+    </resultMap>
+    <select id="selectByCategory" resultMap="productSaleResult">
+        SELECT
+        product_id, shop_id, sold, stock,
+        income, price, imageUrl,
+        product_name, category
+        FROM product_sale
+        <where>
+            <if test="category != null and category != '' and category != '全部'">
+                category = #{category}
+            </if>
+        </where>
+    </select>
+
+
+    <resultMap id="userAddressResult" type="com.example.keshe.response.UserInfoResponse$Addresses">
+        <id property="addressId" column="AddressId"/>
+
+        <result property="recipientName" column="RecipientName"/>
+        <result property="shippingAddress" column="ShippingAddress"/>
+        <result property="recipientPhone" column="RecipientPhone"/>
+
+    </resultMap>
+    <select id="selectUserAddress" resultMap="userAddressResult">
+
+        SELECT
+        AddressId,RecipientName, ShippingAddress, RecipientPhone
+        FROM shoppingaddress
+        WHERE userId = #{userId}
+    </select>
+
+    <resultMap id="userOrderResult" type="com.example.keshe.response.UserInfoResponse$Orders">
+        <id property="order_id" column="order_id"/>
+        <result property="shop_id" column="shop_id"/>
+        <result property="status" column="status"/>
+        <result property="create_time" column="create_time"/>
+        <result property="product_name" column="product_name"/>
+        <result property="product_id" column="product_id"/>
+        <result property="product_buy" column="product_buy"/>
+        <result property="buy_info" column="buy_info"/>
+        <result property="total_amount" column="total_amount"/>
+        <result property="receiver_name" column="receiver_name"/>
+        <result property="receiver_phone" column="receiver_phone"/>
+        <result property="receiver_address" column="receiver_address"/>
+        <result property="payment_time" column="payment_time"/>
+        <result property="logistics_company" column="logistics_company"/>
+        <result property="ship_time" column="ship_time"/>
+        <result property="receive_time" column="receive_time"/>
+        <result property="product_imageUrl" column="product_imageUrl"/>
+    </resultMap>
+    <select id="selectUserOrder" resultMap="userOrderResult">
+        SELECT
+        order_id, shop_id, status, create_time,
+        product_name, product_id, product_buy,
+        buy_info, total_amount, receiver_name,
+        receiver_phone, receiver_address, payment_time,
+        logistics_company, ship_time, receive_time,
+        product_imageUrl
+        FROM orders
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insertAddress">
+        INSERT INTO shoppingaddress(userId, RecipientName, ShippingAddress, RecipientPhone) VALUES (#{userId},#{contact}, #{detail}, #{phone})
+    </insert>
+
+    <delete id="deleteAddress">
+        DELETE FROM shoppingaddress WHERE AddressId = #{addressId} and UserId = #{userId}
+    </delete>
+
+    <update id="updateAddress">
+        UPDATE orders SET status='已完成' WHERE order_id = #{orderId}
+    </update>
+
+    <delete id="deleteOrder">
+        DELETE FROM orders WHERE order_id = #{orderId}
+    </delete>
+
+    <insert  id="purchase">
+        INSERT INTO orders(user_id, shop_id, status, create_time, product_name, product_id, product_buy, buy_info,
+    total_amount, receiver_name, receiver_phone, receiver_address, payment_time, logistics_company, ship_time,
+    receive_time, product_imageUrl)
+        select p2.UserId,p1.shop_id,'待发货',now(),p1.product_name,p1.product_id,#{quantity},#{note},p1.price*#{quantity},
+               p2.RecipientName,p2.RecipientPhone,
+               p2.ShippingAddress,now(),null,null,null,p1.imageUrl
+        from product_sale p1,shoppingaddress p2
+        where p1.product_id =#{productId} and p2.AddressId = #{addressId} and p2.UserId = #{userId}
+    </insert>
+
+    <update id="updateStock">
+        UPDATE product_sale SET stock = stock - #{quantity} ,sold = sold + #{quantity} WHERE product_id = #{productId}
+    </update>
+</mapper>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.keshe.mapper.MApplyMapper">
+
+    <insert id="insertApply_Form" parameterType="com.example.keshe.entity.ApplyForm">
+        INSERT INTO apply_form (
+            shop_name, shop_address, legal_representative, id_number, contact_number,
+            business_license, shop_category, shop_description, id_card_front, id_card_back,
+            apply_time
+        )
+        VALUES (
+                   #{shopName}, #{shopAddress}, #{legalRepresentative}, #{idNumber}, #{contactNumber},
+                   #{businessLicense}, #{shopCategory}, #{shopDescription}, #{idCardFront}, #{idCardBack},
+                   #{applyTime}
+               )
+    </insert>
+
+</mapper>

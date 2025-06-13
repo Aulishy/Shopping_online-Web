@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.keshe.mapper.MerAuditMapper">
+    <resultMap id="merAuditResultMap" type="com.example.keshe.response.MerAuditResponse$Audit">
+        <id property="id" column="id"/>
+        <result property="shop_name" column="shop_name"/>
+        <result property="legal_representative" column="legal_representative"/>
+        <result property="id_number" column="id_number"/>
+        <result property="contact_number" column="contact_number"/>
+        <result property="business_license" column="business_license"/>
+        <result property="shop_category" column="shop_category"/>
+        <result property="shop_description" column="shop_description"/>
+        <result property="id_card_front" column="id_card_front"/>
+        <result property="id_card_back" column="id_card_back"/>
+        <result property="apply_time" column="apply_time"/>
+        <result property="audit_status" column="audit_status"/>
+        <result property="audit_reason" column="audit_reason"/>
+        <result property="shop_address" column="shop_address"/>
+    </resultMap>
+    <select id="getMerAuditByMerId" resultMap="merAuditResultMap">
+         SELECT
+             p.id AS id,
+             p.shop_name AS shop_name,
+             p.legal_representative AS legal_representative,
+             p.id_number AS id_number,
+             p.contact_number AS contact_number,
+             p.business_license AS business_license,
+             p.shop_category AS shop_category,
+             p.shop_description AS shop_description,
+             p.id_card_front AS id_card_front,
+             p.id_card_back AS id_card_back,
+             p.apply_time AS apply_time,
+             p.audit_status AS audit_status,
+             p.audit_reason AS audit_reason,
+              p.shop_address AS shop_address
+         from apply_form p
+         
+    </select>
+
+    <update id="updateMerAuditStatus" >
+        update apply_form
+        set audit_status = '1'
+        where id = #{merchantId}
+    </update>
+
+    <insert id="insertMerAudit">
+        INSERT INTO users (role, username, phone, password)
+        SELECT merchant_apply.role, merchant_apply.username, merchant_apply.phone, merchant_apply.password
+        FROM merchant_apply,apply_form
+        WHERE merchant_apply.phone=apply_form.contact_number and apply_form.id=#{merchantId}
+    </insert>
+
+    <update id="rejectMerAuditStatus">
+        update apply_form
+        set audit_status = '2',audit_reason = #{reason}
+        where id = #{merchantId}
+    </update>
+
+    <update id="updateProAudit">
+        update product_audit
+        set status = 'approved'
+        where PAudit_id = #{pauditId}
+    </update>
+
+    <insert  id="insertProAudit">
+        INSERT INTO product_sale(product_id, shop_id,sold,stock,income,price,imageUrl,product_name,category)
+        SELECT product_audit.PAudit_id,product_audit.shop_id,'0',product_audit.stock,'0',product_audit.price,product_audit.image_url,product_audit.product_name,product_audit.category
+            FROM product_audit
+        WHERE product_audit.PAudit_id=#{pauditId}
+    </insert>
+
+    <update id="rejectProAuditStatus">
+        update product_audit
+        set status = 'rejected',reject_reason = #{reason}
+        where PAudit_id = #{pauditId}
+    </update>
+</mapper>

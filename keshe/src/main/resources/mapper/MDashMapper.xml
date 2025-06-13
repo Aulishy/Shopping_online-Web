@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.keshe.mapper.MDashMapper">
+
+    <!-- 查询店铺信息 -->
+    <resultMap id="ShopInfoResultMap" type="com.example.keshe.response.MDashResponse$ShopInfo">
+    <result property="name" column="shop_name"/>
+    <result property="address" column="shop_address"/>
+    <result property="category" column="shop_category"/>
+    <result property="establishedDate" column="apply_time"/>
+</resultMap>
+
+    <select id="getShopInfo" resultMap="ShopInfoResultMap">
+        SELECT shop_name , shop_address , shop_category,apply_time
+        FROM merchant_info
+        WHERE shop_id = #{shopId}
+    </select>
+
+    <!-- 查询店铺统计 -->
+    <resultMap id="ShopStatsResultMap" type="com.example.keshe.response.MDashResponse$ShopStats">
+        <result property="totalOrders" column="total_orders"/>
+        <result property="totalIncome" column="total_income"/>
+    </resultMap>
+
+
+    <select id="getShopStats" resultMap="ShopStatsResultMap">
+        SELECT
+                (SELECT COUNT(*) FROM orders WHERE shop_id = #{shopId}) AS total_orders,
+                (SELECT SUM(income) FROM product_sale WHERE shop_id = #{shopId}) AS total_income
+    </select>
+
+    <!-- 查询店铺商品列表 -->
+    <resultMap id="ShopProductResultMap" type="com.example.keshe.response.MDashResponse$ShopProducts">
+        <result property="id" column="product_id"/>
+        <result property="imageUrl" column="imageUrl"/>
+        <result property="name" column="product_name"/>
+        <result property="price" column="price"/>
+        <result property="stock" column="stock"/>
+        <result property="sold" column="sold"/>
+    </resultMap>
+
+
+    <select id="getShopProducts" resultMap="ShopProductResultMap">
+        SELECT product_id, imageUrl, product_name, price, stock, sold
+        FROM product_sale
+        WHERE shop_id = #{shopId}
+    </select>
+
+
+    <update id="updateShopProducts">
+        UPDATE product_sale
+        SET stock = stock + #{addAmount}
+        WHERE product_id = #{productId}
+    </update>
+
+
+    <delete id="deleteShopProducts">
+        DELETE FROM product_sale
+        WHERE product_id = #{productId} and shop_id = #{shopId}
+    </delete>
+
+</mapper>

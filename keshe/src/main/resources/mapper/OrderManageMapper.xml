@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.keshe.mapper.OrderManageMapper">
+
+    <!-- 全字段映射 -->
+    <resultMap id="orderFullResultMap" type="com.example.keshe.response.OrderManageResponse$OrderData">
+        <id property="orderId" column="order_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="shopId" column="shop_id"/>
+        <result property="status" column="status"/> <!-- 英文状态 -->
+        <result property="statusText" column="status_text"/> <!-- 中文原始状态 -->
+        <result property="createTime" column="create_time"/>
+        <result property="productName" column="product_name"/>
+        <result property="productId" column="product_id"/>
+        <result property="productBuy" column="product_buy"/>
+        <result property="buyInfo" column="buy_info"/>
+        <result property="totalAmount" column="total_amount"/>
+        <result property="receiverName" column="receiver_name"/>
+        <result property="receiverPhone" column="receiver_phone"/>
+        <result property="receiverAddress" column="receiver_address"/>
+        <result property="paymentTime" column="payment_time"/>
+        <result property="logisticsCompany" column="logistics_company"/>
+        <result property="shipTime" column="ship_time"/>
+        <result property="receiveTime" column="receive_time"/>
+        <result property="productImageUrl" column="product_imageUrl"/>
+    </resultMap>
+
+    <!-- 查询店铺下所有订单 -->
+    <select id="getAllOrdersByShopId" resultMap="orderFullResultMap">
+        SELECT
+            o.order_id AS order_id,
+            o.user_id AS user_id,
+            o.shop_id AS shop_id,
+            CASE o.status
+                WHEN '待发货' THEN 'pending'
+                WHEN '已发货' THEN 'shipped'
+                WHEN '已完成' THEN 'completed'
+                ELSE 'unknown'
+                END AS status,
+            o.status AS status_text,
+            o.create_time AS create_time,
+            o.product_name AS product_name,
+            o.product_id AS product_id,
+            o.product_buy AS product_buy,
+            o.buy_info AS buy_info,
+            o.total_amount AS total_amount,
+            o.receiver_name AS receiver_name,
+            o.receiver_phone AS receiver_phone,
+            o.receiver_address AS receiver_address,
+            o.payment_time AS payment_time,
+            o.logistics_company AS logistics_company,
+            o.ship_time AS ship_time,
+            o.receive_time AS receive_time,
+            o.product_imageUrl AS product_imageUrl
+        FROM orders o
+        WHERE o.shop_id = #{shopId}
+        ORDER BY o.create_time DESC
+    </select>
+
+    <delete id="deleteOrder">
+        DELETE FROM orders
+        WHERE order_id = #{orderId}
+    </delete>
+
+    <update id="updateOrderStatus">
+        UPDATE orders
+        SET status = '已发货', logistics_company = #{logisticsCompany}
+        WHERE order_id = #{orderId}
+    </update>
+</mapper>

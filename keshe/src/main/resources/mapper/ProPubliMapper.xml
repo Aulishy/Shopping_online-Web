@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.keshe.mapper.ProPubliMapper">
+    <resultMap id="proPubliResultMap" type="com.example.keshe.response.ProPubliResponse$ProPubliData">
+         <id property="PAudit_id" column="PAudit_id"/>
+         <result property="shop_id" column="shop_id"/>
+         <result property="product_name" column="product_name"/>
+         <result property="stock" column="stock"/>
+         <result property="price" column="price"/>
+          <result property="category" column="category"/>
+         <result property="description" column="description"/>
+         <result property="image_url" column="image_url"/>
+         <result property="status" column="status"/>
+         <result property="submit_time" column="submit_time"/>
+          <result property="reject_result" column="reject_result"/>
+    </resultMap>
+    <select id="getProPubliByShopId" resultMap="proPubliResultMap">
+         SELECT
+            p.PAudit_id AS PAudit_id,
+            p.shop_id AS shop_id,
+            p.product_name AS product_name,
+            p.stock AS stock,
+            p.price AS price,
+            p.category AS category,
+            p.description AS description,
+            p.image_url AS image_url,
+             p.status AS status,
+             p.submit_time AS submit_time,
+             p.reject_reason AS reject_reason
+         from product_audit p
+          where p.shop_id=#{shopId}
+    </select>
+
+    <delete id="deleteAuditRecord">
+         delete from product_audit where PAudit_id=#{auditId} and  shop_id=#{shopId}
+    </delete>
+
+    <insert id="insertAuditRecord" >
+        insert into product_audit(shop_id,product_name,stock,price,category,description,image_url,status,submit_time)
+        values(#{shopId},#{product_name},#{stock},#{price},#{category},#{description},#{image_url},'pending_audit',#{submit_time})
+    </insert>
+</mapper>

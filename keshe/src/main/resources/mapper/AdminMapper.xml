@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- 修复后的DTD声明（推荐使用本地路径） -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd">
+<mapper namespace="com.example.keshe.mapper.AdminMapper">
+    <!-- 原有内容保持不变 -->
+    <resultMap id="productAuditResult" type="com.example.keshe.response.AdminResponse$ProductAudit">
+        <id property="PAudit_id" column="PAudit_id"/>
+        <result property="shop_id" column="shop_id"/>
+        <result property="product_name" column="product_name"/>
+        <result property="price" column="price"/>
+        <result property="stock" column="stock"/>
+        <result property="category" column="category"/>
+        <result property="description" column="description"/>
+        <result property="image_url" column="image_url"/>
+        <result property="submit_time" column="submit_time"/>
+    </resultMap>
+
+    <select id="getProductAudit" resultMap="productAuditResult">
+        SELECT PAudit_id,shop_id,product_name,price,stock,category,description,image_url,submit_time
+        FROM product_audit
+        WHERE status = 'pending_audit'
+    </select>
+</mapper>
