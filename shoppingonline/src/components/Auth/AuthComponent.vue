@@ -1,8 +1,7 @@
 <template>
-  <!-- 修改背景图片引用方式 -->
   <div class="auth-container" :style="{ backgroundImage: `url(/assets/v2-21cb8db22fb059184fc18ede2c75d05d_r.jpg)` }"> <!-- 关键修改 -->
     <div class="auth-card">
-      <!-- 原有内容保持不变 -->
+      
       <h2 style="color: white;">欢迎登录</h2>
       <div v-if="activeTab === 'login'">
         <form @submit.prevent="handleLogin">
@@ -88,7 +87,7 @@ export default {
   },
   methods: {
     async handleLogin() {
-      // 登录表单验证
+      
       if (!this.loginForm.role || !this.loginForm.phone || !this.loginForm.password) {
         alert('请填写完整的登录信息');
         return;
@@ -96,20 +95,19 @@ export default {
       try {
         const response = await axios.post('http://localhost:8081/login', this.loginForm);
         if (response.data.status === 200) {
-          const { role, id} = response.data.pdata; // 从后端数据中解构id
+          const { role, id} = response.data.pdata; 
           switch (role) {
             case 'user':
-              this.$router.push({ path: '/userhome', query: { id } }); // 传递phone到用户主页
+              this.$router.push({ path: '/userhome', query: { id } }); 
               break;
             case 'merchant':
-              this.$router.push({ path: '/merchant-dashboard', query: {id } }); // 传递phone到商家后台
+              this.$router.push({ path: '/merchant-dashboard', query: {id } }); 
               break;
             case 'admin':
-              this.$router.push({ path: '/merchantAudit', query: { id } }); // 传递phone到审核页
+              this.$router.push({ path: '/merchantAudit', query: { id } }); 
               break;
             default:
                 alert('未知角色，请联系管理员！');
-                // 可以选择跳转到错误页面或首页
                 this.$router.push('/');
         }
        }else{
@@ -120,7 +118,6 @@ export default {
       }
     },
     async handleRegister() {
-      // 注册表单验证
       if (
         !this.registerForm.role ||
         !this.registerForm.username ||
@@ -138,13 +135,13 @@ export default {
       try {
         const response = await axios.post('http://localhost:8081/register', this.registerForm);
         if (response.data.status === 200) {
-          const { role, phone } = response.data.pdata; // 从后端数据中解构phone
+          const { role, phone } = response.data.pdata; 
           switch (role) {
             case 'user':
               this.$router.push({ path: '/userhome', query: { phone } });
               break;
             case 'merchant':
-              this.$router.push({ path: '/merchant-apply', query: { phone } }); // 传递phone到入驻申请页
+              this.$router.push({ path: '/merchant-apply', query: { phone } });
               break;
             case 'admin':
                 alert('登录成功');
@@ -152,7 +149,6 @@ export default {
                 break;
             default:
                 alert('未知角色，请联系管理员！');
-                // 可以选择跳转到错误页面或首页
                 this.$router.push('/');
         }
         } else {
@@ -168,7 +164,6 @@ export default {
 
 
 <style scoped>
-/* 重置默认边距 */
 html, body {
   margin: 0;
   padding: 0;
@@ -225,7 +220,6 @@ h2 {
   min-width: 200px; /* 设置输入框最小宽度 */
 }
 
-/* 同步调整身份选择区域的布局 */
 .form-container {
   display: flex;
   flex-direction: row;

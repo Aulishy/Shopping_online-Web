@@ -333,13 +333,3 @@ INSERT INTO users (role, username, phone, password) VALUES
 #  ALTER TABLE apply_form MODIFY COLUMN id_card_front VARCHAR(225);
 #  ALTER TABLE apply_form MODIFY COLUMN id_card_back VARCHAR(225);
 #  ALTER TABLE apply_form MODIFY COLUMN business_license VARCHAR(225);
-
-CREATE TABLE ShippingAddress
-(
-    AddressId       INT PRIMARY KEY AUTO_INCREMENT,                                 -- 收货地址唯一标识符
-    UserId          INT          NOT NULL,                                          -- 关联用户表的外键
-    RecipientName   VARCHAR(50)  NOT NULL,                                          -- 收件人姓名
-    ShippingAddress VARCHAR(255) NOT NULL,                                          -- 收货地址详细信息
-    RecipientPhone  VARCHAR(20)  NOT NULL                                          -- 收件人电话号码
-
-);

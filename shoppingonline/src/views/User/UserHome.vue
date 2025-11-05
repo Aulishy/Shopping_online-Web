@@ -4,13 +4,25 @@
     <header class="top-navbar">
       <div class="navbar-content">
         <div class="logo">
-          <router-link to="/">购物商城</router-link>
+          <router-link to="/">
+            <img
+            src="/assets/shop.png"
+            alt="购物商城"
+            class="logo-image"
+          />
+            购物商城</router-link>
         </div>
         <nav class="user-nav">
-          <router-link :to="{ path: '/userHome', query: { id: $route.query.id } }" class="nav-item">首页</router-link>
-          <router-link :to="{ path: '/userProfile', query: { id: $route.query.id } }" class="nav-item">个人信息</router-link>
+          <router-link :to="{ path: '/userHome', query: { id: $route.query.id } }" class="nav-item">
+            <img src="/assets/home.png" alt="首页" class="logo-image"/>首页
+          </router-link>
+          <router-link :to="{ path: '/userProfile', query: { id: $route.query.id } }" class="nav-item">
+            <img src="/assets/personal-center.png" alt="个人信息" class="logo-image"/>个人信息
+          </router-link>
           
-          <button class="logout-btn" @click="handleLogout">退出登录</button>
+          <button class="logout-btn" @click="handleLogout">退出登录
+            <img src="/assets/logout.png" alt="退出登录" class="logo-image"/>
+          </button>
         </nav>
       </div>
     </header>
@@ -27,7 +39,42 @@
           @input="handleSearch" 
           @keyup.enter="handleSearch"
         />
-        <button class="search-btn" @click="handleSearch">搜索</button>
+        <button class="search-btn" @click="handleSearch">
+           <img 
+            src="/assets/sereach.png" 
+            alt="搜索图标" 
+            class="logo-image"
+          />搜索
+        </button>
+      </div>
+
+      
+      <!-- 新增：轮播图 -->
+       <div class="swiper-container">
+    <div 
+      class="swiper-wrapper"
+      :style="{ transform: `translateX(-${currentSlide * 100}%)` }"  
+    >
+      <div 
+        v-for="(slide, index) in slides" 
+        :key="index" 
+        class="swiper-slide"  
+      >
+        <img :src="slide.image" alt="轮播图" class="swiper-img" />
+      </div>
+    </div>
+        <!-- 分页点 -->
+        <div class="swiper-pagination">
+          <span 
+            v-for="(slide, index) in slides" 
+            :key="index" 
+            :class="{ active: currentSlide === index }"
+            @click="currentSlide = index"
+          ></span>
+        </div>
+        <!-- 左右导航按钮 -->
+        <button class="swiper-btn prev" @click="prevSlide">&lt;</button>
+        <button class="swiper-btn next" @click="nextSlide">&gt;</button>
       </div>
 
       <!-- 商品分类导航 -->
@@ -132,11 +179,18 @@ export default {
       currentCategory: '全部',
       categories: ['全部', '电子产品', '服装鞋包', '家居日用', '食品饮料'],
       hotProducts: [],
-      originalProducts: [], // 新增：存储未过滤的原始商品数据
+      
       userAddress: '', 
       showPurchaseModal: false,  // 控制购买模态框显示
       selectedProduct: null,     // 当前选中的商品
-      purchaseQuantity: 1        // 购买数量
+      purchaseQuantity: 1   ,     // 购买数量
+       slides: [  // 轮播图数据（示例，需替换为实际图片路径）
+        { image: '/assets/shop.png' },
+        { image: '/assets/shop.png' },
+        { image: '/assets/shop.png' }
+      ],
+      currentSlide: 0,  // 当前显示的轮播项索引
+      intervalId: null  // 自动播放定时器
     };
   },
   async mounted() {
@@ -145,10 +199,14 @@ export default {
       const response = await axios.post('http://localhost:8081/user/home', params);
       this.hotProducts = response.data.data;
       this.originalProducts = [...this.hotProducts]; // 在挂载时保存原始数据
+      this.startAutoPlay();  // 启动自动播放
     } catch (error) {
       console.error('获取热销商品失败:', error);
     }
     await this.fetchUserProfile();
+  },
+   beforeUnmount() {
+    this.stopAutoPlay();  // 组件销毁时清除定时器
   },
   methods: {
     handleCategoryChange(newCategory) {
@@ -242,6 +300,20 @@ export default {
       } catch (error) {
         alert('网络请求失败，请稍后重试');
       }
+    },
+    prevSlide() {
+      this.currentSlide = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
+    },
+    nextSlide() {
+      this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+    },
+    startAutoPlay() {
+      this.intervalId = setInterval(() => {
+        this.nextSlide();
+      }, 3000);  // 3秒切换一次
+    },
+    stopAutoPlay() {
+      clearInterval(this.intervalId);
     }
   }
 };
@@ -274,7 +346,14 @@ export default {
   font-weight: bold;
   text-decoration: none;
 }
-
+/* 在<style scoped>中新增图片样式 */
+.logo-image {
+  height: 25px;  /* 根据设计需求调整高度 */
+  width: auto;   /* 保持宽度自适应，维持图片比例 */
+  vertical-align: middle;  /* 垂直居中对齐文字（若有其他文字） */
+  margin-right: 10px;
+  object-fit: contain;
+}
 .user-nav {
   display: flex;
   gap: 20px;
@@ -335,8 +414,11 @@ export default {
   transition: background-color 0.3s;
 }
 
-.search-btn:hover {
-  background-color: #ff5252;
+.search-icon {
+  height: 16px;  /* 根据实际需要调整图标高度 */
+  width: 16px;   /* 保持宽高一致 */
+  margin-right: 8px;  /* 图标与文字的间距 */
+  vertical-align: middle;  /* 与文字垂直居中对齐 */ 
 }
 
 /* 商品分类导航 */
@@ -544,5 +626,75 @@ export default {
 .manage-address-link:hover {
   text-decoration: underline;
 }
+
+
+/* 新增：轮播图样式 */
+.swiper-container {
+  position: relative;
+  max-width: 1200px;
+  margin: 20px auto;
+  height: 300px;  /* 根据实际需求调整高度 */
+  overflow: hidden;
+}
+
+.swiper-wrapper {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.swiper-slide {
+  flex: 0 0 100%;
+  height: 100%;
+}
+
+.swiper-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;  /* 覆盖容器，可能裁剪 */
+}
+
+.swiper-pagination {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+}
+
+.swiper-pagination span {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+}
+
+.swiper-pagination span.active {
+  background: #ff6b6b;  /* 激活状态颜色 */
+}
+
+.swiper-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.3);
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 18px;
+  transition: background 0.3s;
+}
+
+.swiper-btn:hover {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.swiper-btn.prev { left: 10px; }
+.swiper-btn.next { right: 10px; }
 
 </style>
